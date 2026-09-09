@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Indoor Space | IoT Monitoring & Automation</title>
+<meta name="description" content="IoT-based smart indoor space monitoring and automation using ESP32, DHT11, LDR and PIR sensors.">
+<style>
+:root{
+  --navy:#0b2340; --navy2:#143d67; --teal:#08a88f; --cyan:#4cc9f0;
+  --purple:#7b61ff; --orange:#ff9f43; --pink:#f15bb5; --yellow:#ffd166;
+  --light:#f5f8ff; --ink:#17324d; --muted:#5a7085; --white:#fff; --line:#d9e4f0;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--light);color:var(--ink);line-height:1.6}
+a{color:inherit}
+.container{width:min(1120px,92%);margin:auto}
+header{background:linear-gradient(135deg,var(--navy),#12395b);color:white;position:relative;overflow:hidden}
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+.logo{font-weight:800;letter-spacing:.06em}
+nav .links{display:flex;gap:22px;font-size:.95rem}
+nav a{text-decoration:none;opacity:.9}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center;padding:70px 0 82px}
+.badge{display:inline-block;background:#d7f7f5;color:var(--teal);padding:7px 12px;border-radius:999px;font-weight:800;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
+h1{font-size:clamp(2.3rem,5vw,4.6rem);line-height:1.03;margin:16px 0}
+.hero p{font-size:1.1rem;color:#cfe2ef;max-width:650px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.btn{display:inline-block;padding:13px 18px;border-radius:12px;text-decoration:none;font-weight:800}
+.btn.primary{background:var(--orange);color:var(--navy)}
+.btn.secondary{border:1px solid #6f95ab;color:#fff}
+.hero img{width:100%;display:block;border-radius:26px}
+section{padding:70px 0}
+.section-head{max-width:720px;margin-bottom:32px}
+.eyebrow{color:var(--teal);font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:.8rem}
+h2{font-size:clamp(1.9rem,4vw,3rem);line-height:1.12;margin:10px 0}
+.muted{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:white;border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 10px 25px rgba(19,50,77,.05)}
+.card h3{margin:12px 0 8px}
+.icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:#e5f7f6;color:var(--teal);font-weight:900}
+.arch{background:var(--navy);border-radius:28px;padding:18px}
+.arch img{width:100%;display:block;border-radius:18px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.step{background:white;border:1px solid var(--line);border-radius:18px;padding:20px}
+.num{font-size:1.7rem;font-weight:900;color:var(--teal)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.feature{background:white;border:1px solid var(--line);border-radius:22px;padding:28px}
+.feature ul{padding-left:20px}
+.qrbox{display:grid;grid-template-columns:180px 1fr;gap:28px;align-items:center;background:linear-gradient(135deg,#e6f8f6,#eef7fc);border-radius:26px;padding:26px;border:1px solid var(--line)}
+.qrbox img{width:180px;height:180px;background:#fff;padding:10px;border-radius:14px}
+.note{font-size:.92rem;color:var(--muted)}
+footer{background:var(--navy);color:#cfe2ef;padding:36px 0}
+footer strong{color:white}
+@media(max-width:900px){
+  .hero,.two{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr}
+}
+@media(max-width:620px){
+  nav .links{display:none}
+  .grid,.steps,.qrbox{grid-template-columns:1fr}
+  .qrbox img{margin:auto}
+}
+
+.brand{display:flex;align-items:center;gap:12px}.brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#08a88f,#4cc9f0,#7b61ff);display:grid;place-items:center;font-weight:900;color:white}.brand-text{font-weight:900;letter-spacing:.08em}.hero{background:radial-gradient(circle at 85% 20%,rgba(76,201,240,.18),transparent 28%),radial-gradient(circle at 10% 80%,rgba(241,91,181,.16),transparent 26%)}.section-head .eyebrow{background:linear-gradient(90deg,#08a88f,#7b61ff);-webkit-background-clip:text;background-clip:text;color:transparent}.btn.primary{background:linear-gradient(135deg,#ff9f43,#ffd166)}.team{background:linear-gradient(135deg,#0b2340,#193b63 55%,#4a2e78);color:white;border-radius:28px;padding:34px}.team .eyebrow{color:#4cc9f0}.team-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:24px}.member{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:18px;text-align:center}.member.leader{background:linear-gradient(135deg,rgba(8,168,143,.42),rgba(76,201,240,.22))}.member .avatar{width:52px;height:52px;margin:0 auto 10px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#ff9f43,#f15bb5);color:#fff;font-weight:900}.member.leader .avatar{background:linear-gradient(135deg,#08a88f,#4cc9f0)}.member small{display:block;color:#cde0ef;margin-top:3px}@media(max-width:900px){.team-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:620px){.team-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <nav>
+      <div class="brand"><div class="brand-mark">SS</div><div class="brand-text">SMART SPHERE</div></div>
+      <div class="links">
+        <a href="#overview">Overview</a>
+        <a href="#hardware">Hardware</a>
+        <a href="#working">Working</a>
+        <a href="#automation">Automation</a>
+        <a href="#future">Future</a>
+      </div>
+    </nav>
+    <div class="hero">
+      <div>
+        <span class="badge">IoT • Monitoring • Automation</span>
+        <h1>Make indoor spaces smarter.</h1>
+        <p>Monitor temperature, humidity, light intensity and human presence with an ESP32-based system, send the readings to the cloud, and use simple conditions to automate a low-voltage light.</p>
+        <div class="cta">
+          <a class="btn primary" href="#working">See how it works</a>
+          <a class="btn secondary" href="#hardware">View components</a>
+        </div>
+      </div>
+      <img src="assets/architecture.svg" alt="ESP32 smart indoor space architecture diagram">
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="overview">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Project overview</div>
+      <h2>One system for sensing, monitoring and action</h2>
+      <p class="muted">The project is designed for indoor environments such as classrooms, laboratories, offices and residential rooms. It combines low-cost sensors, wireless communication, cloud monitoring and basic automation.</p>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="icon">01</div><h3>Monitor</h3><p>Capture temperature, humidity, light level and human presence in real time.</p></div>
+      <div class="card"><div class="icon">02</div><h3>Connect</h3><p>Use the ESP32's wireless connection to send sensor data to the cloud.</p></div>
+      <div class="card"><div class="icon">03</div><h3>Automate</h3><p>Use simple rules such as presence + low light to switch a low-voltage LED.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="hardware">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Hardware</div>
+      <h2>Core components</h2>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="icon">E</div><h3>ESP32</h3><p>Main controller. Reads sensors, makes local decisions and communicates wirelessly.</p></div>
+      <div class="card"><div class="icon">T</div><h3>DHT11</h3><p>Measures room temperature and humidity.</p></div>
+      <div class="card"><div class="icon">L</div><h3>LDR</h3><p>Measures the surrounding light level so the system can identify darker conditions.</p></div>
+      <div class="card"><div class="icon">P</div><h3>PIR sensor</h3><p>Detects human movement or presence in the monitored area.</p></div>
+      <div class="card"><div class="icon">W</div><h3>Wireless link</h3><p>Moves sensor telemetry from the ESP32 to the cloud for remote monitoring.</p></div>
+      <div class="card"><div class="icon">A</div><h3>LED output</h3><p>Provides a visible low-voltage example of automatic lighting control.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="working">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">How it works</div>
+      <h2>From sensor reading to dashboard</h2>
+    </div>
+    <div class="arch"><img src="assets/architecture.svg" alt="System architecture"></div>
+    <div style="height:22px"></div>
+    <div class="steps">
+      <div class="step"><div class="num">01</div><h3>Sense</h3><p class="muted">Sensors collect environmental and occupancy data.</p></div>
+      <div class="step"><div class="num">02</div><h3>Process</h3><p class="muted">The ESP32 reads, formats and evaluates the sensor values.</p></div>
+      <div class="step"><div class="num">03</div><h3>Send</h3><p class="muted">Readings are transmitted wirelessly to the cloud.</p></div>
+      <div class="step"><div class="num">04</div><h3>Visualize</h3><p class="muted">The dashboard shows live values and historical trends.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="automation">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Automation</div>
+      <h2>Turn data into a simple action</h2>
+      <p class="muted">The demonstration version uses a low-voltage LED to show how sensor conditions can trigger a response.</p>
+    </div>
+    <div class="two">
+      <div class="feature">
+        <h3>Example rule</h3>
+        <p><strong>Person detected + low light → LED ON</strong></p>
+        <p><strong>Enough light OR no person → LED OFF</strong></p>
+        <p class="note">The exact light threshold is calibrated from the LDR readings in the demonstration environment.</p>
+      </div>
+      <div class="feature">
+        <h3>What the judge can see</h3>
+        <ul>
+          <li>Cover the LDR to simulate darkness.</li>
+          <li>Move in front of the PIR sensor.</li>
+          <li>Watch the LED switch on automatically.</li>
+          <li>Shine a phone flashlight or step away and observe the response.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cloud">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Cloud monitoring</div>
+      <h2>Remote visibility</h2>
+      <p class="muted">Sensor telemetry can be displayed on a cloud dashboard using value cards, status indicators and time-series graphs.</p>
+    </div>
+    <div class="grid">
+      <div class="card"><h3>Temperature</h3><p class="muted">Live temperature value and history.</p></div>
+      <div class="card"><h3>Humidity</h3><p class="muted">Live humidity percentage and history.</p></div>
+      <div class="card"><h3>Light</h3><p class="muted">Current light reading for automation and analysis.</p></div>
+      <div class="card"><h3>Presence</h3><p class="muted">Motion/presence status from the PIR sensor.</p></div>
+      <div class="card"><h3>Device status</h3><p class="muted">Show whether the ESP32 is connected and sending data.</p></div>
+      <div class="card"><h3>Trends</h3><p class="muted">Compare readings over time to understand indoor conditions.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="future">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Future scope</div>
+      <h2>Where the project can go next</h2>
+    </div>
+    <div class="two">
+      <div class="feature">
+        <h3>More sensing</h3>
+        <p>Add air-quality, sound, water-leak, door or energy-monitoring sensors.</p>
+      </div>
+      <div class="feature">
+        <h3>Smarter decisions</h3>
+        <p>Add notifications, historical analytics, energy-use tracking and intelligent prediction.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="team">
+  <div class="container">
+    <div class="team">
+      <div class="eyebrow">Our team</div>
+      <h2 style="margin-top:8px">Smart Sphere</h2>
+      <p style="color:#d8e8f3;max-width:760px">A student team building a practical IoT solution for smarter indoor spaces.</p>
+      <div class="team-grid">
+        <div class="member leader"><div class="avatar">B</div><strong>Bishwadeo</strong><small>Team Leader</small></div>
+        <div class="member"><div class="avatar">P</div><strong>Palak</strong><small>Member</small></div>
+        <div class="member"><div class="avatar">P</div><strong>Pawan</strong><small>Member</small></div>
+        <div class="member"><div class="avatar">H</div><strong>Harshini</strong><small>Member</small></div>
+        <div class="member"><div class="avatar">K</div><strong>Kavana</strong><small>Member</small></div>
+        <div class="member"><div class="avatar">P</div><strong>Pranathi</strong><small>Member</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="qr">
+  <div class="container">
+    <div class="qrbox">
+      <img src="qr_code.png" alt="QR code for the project webpage">
+      <div>
+        <div class="eyebrow">Scan to explore</div>
+        <h2 style="margin-top:8px">Project webpage</h2>
+        <p class="muted">Scan the QR code to open the online project page. The included QR currently uses a placeholder URL and should be regenerated after the website is published.</p>
+        <p class="note"><strong>Publishing tip:</strong> GitHub Pages is a simple option. After publishing, replace the URL in <code>site_url.txt</code> and run <code>generate_qr.py</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">
+    <strong>Smart Sphere</strong><br>
+    IoT-Based Monitoring and Automation System • ESP32 • Sensors • Cloud
+  </div>
+</footer>
+</body>
+</html>
